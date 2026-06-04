@@ -1,0 +1,5 @@
+window.__ENV__ = {
+  VITE_OME_API_BASE: '',
+  VITE_OME_API_USER: '',
+  VITE_OME_API_PASS: ''
+};

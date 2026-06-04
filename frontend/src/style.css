@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --color-background: #f8fafc;
+  --color-foreground: #0f172a;
+  --color-card: #ffffff;
+  --color-card-foreground: #0f172a;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  --color-primary: #6366f1;
+  --color-primary-hover: #4f46e5;
+  --color-primary-foreground: #ffffff;
+  --color-subtle: #e2e8f0;
+  --color-sidebar: #1e293b;
+  --color-sidebar-foreground: #f8fafc;
+  --color-sidebar-muted: #94a3b8;
+  --color-sidebar-hover: #334155;
+  --color-sidebar-border: #475569;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-success: #22c55e;
+
+  color-scheme: light;
+}
+
+.dark {
+  --color-background: #0f172a;
+  --color-foreground: #f8fafc;
+  --color-card: #1e293b;
+  --color-card-foreground: #f8fafc;
+  --color-muted: #1e293b;
+  --color-muted-foreground: #94a3b8;
+  --color-primary: #818cf8;
+  --color-primary-hover: #6366f1;
+  --color-primary-foreground: #ffffff;
+  --color-subtle: #334155;
+  --color-sidebar: #020617;
+  --color-sidebar-foreground: #f8fafc;
+  --color-sidebar-muted: #64748b;
+  --color-sidebar-hover: #1e293b;
+  --color-sidebar-border: #334155;
+  --color-danger: #f87171;
+  --color-warning: #fbbf24;
+  --color-success: #4ade80;
+
+  color-scheme: dark;
+}
+
+@theme {
+  --color-background: initial;
+  --color-foreground: initial;
+  --color-card: initial;
+  --color-card-foreground: initial;
+  --color-muted: initial;
+  --color-muted-foreground: initial;
+  --color-primary: initial;
+  --color-primary-hover: initial;
+  --color-primary-foreground: initial;
+  --color-subtle: initial;
+  --color-sidebar: initial;
+  --color-sidebar-foreground: initial;
+  --color-sidebar-muted: initial;
+  --color-sidebar-hover: initial;
+  --color-sidebar-border: initial;
+  --color-danger: initial;
+  --color-warning: initial;
+  --color-success: initial;
+}
+
+/* Smooth theme transitions for background, border, and text colors */
+body,
+.bg-background,
+.bg-card,
+.bg-sidebar,
+.border-subtle,
+.border-sidebar-border,
+.text-foreground,
+.text-muted-foreground,
+.text-sidebar-foreground,
+.text-sidebar-muted {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Custom scrollbar styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-subtle) transparent;
+}
+
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-subtle);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted-foreground);
+  }
+}
+
+/* Page fade transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Skeleton loading animation */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+.animate-skeleton {
+  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background-color: var(--color-subtle);
+}

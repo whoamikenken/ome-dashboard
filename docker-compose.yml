@@ -1,0 +1,12 @@
+services:
+  ome-dashboard:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8088:80"
+    environment:
+      - VITE_OME_API_BASE=${VITE_OME_API_BASE:-http://localhost:8081/v1}
+      - VITE_OME_API_USER=${VITE_OME_API_USER:-admin}
+      - VITE_OME_API_PASS=${VITE_OME_API_PASS:-password}
+    restart: unless-stopped
