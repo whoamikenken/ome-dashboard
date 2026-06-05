@@ -12,7 +12,7 @@ import OutputProfileForm from '@/components/OutputProfileForm.vue'
 import { updateApp } from '@/api/apps'
 import LLHLSConfig from '@/components/LLHLSConfig.vue'
 import WebRTCConfig from '@/components/WebRTCConfig.vue'
-import { ChevronDown, ChevronRight } from 'lucide-vue-next'
+import { ChevronDown, ChevronRight, Settings } from 'lucide-vue-next'
 import {
   ArrowLeft,
   Plus,
@@ -23,8 +23,12 @@ import {
   Activity,
   Wifi,
   X,
-  Loader2
+  Loader2,
+  Play
 } from 'lucide-vue-next'
+import StreamPlayer from '@/components/StreamPlayer.vue'
+import AutoRecordConfig from '@/components/AutoRecordConfig.vue'
+import AppConfigEditor from '@/components/AppConfigEditor.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -40,6 +44,9 @@ const streams = ref<string[]>([])
 const streamsLoading = ref(true)
 
 const selectedStream = ref<string | null>(null)
+const showPlayer = ref(false)
+const showAutoRecordConfig = ref(false)
+const showConfigEditor = ref(false)
 const showPullForm = ref(false)
 const pullUrl = ref('')
 const isPullingStream = ref(false)
@@ -289,7 +296,14 @@ function getPublisherNames(): string[] {
             </span>
           </div>
         </div>
-        <div>
+        <div class="flex items-center space-x-3">
+          <button
+            @click="showConfigEditor = true"
+            class="px-4 py-2 border border-primary/30 hover:border-primary bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all cursor-pointer"
+          >
+            <Settings class="w-4 h-4" />
+            <span>Edit Config</span>
+          </button>
           <button
             @click="confirmDeleteApp"
             class="px-4 py-2 border border-danger/30 hover:border-danger bg-danger/10 hover:bg-danger/20 text-danger rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all cursor-pointer"
@@ -530,22 +544,95 @@ function getPublisherNames(): string[] {
               <Activity class="w-5 h-5 text-primary animate-pulse" />
               <h3 class="text-lg font-bold text-foreground">Controls: {{ selectedStream }}</h3>
             </div>
-            <button
-              @click="selectedStream = null"
-              class="p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors cursor-pointer"
-              title="Close controls"
-            >
-              <X class="w-5 h-5" />
-            </button>
+            <div class="flex items-center space-x-2">
+              <button
+                @click="showPlayer = true"
+                class="px-3 py-1.5 bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/20 hover:border-primary rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all cursor-pointer shadow-sm"
+              >
+                <Play class="w-3.5 h-3.5 fill-current" />
+                <span>Play Live Stream</span>
+              </button>
+              <button
+                @click="selectedStream = null"
+                class="p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors cursor-pointer"
+                title="Close controls"
+              >
+                <X class="w-5 h-5" />
+              </button>
+            </div>
           </div>
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <PushControls :vhost="vhostName" :app="appName" :streamName="selectedStream" />
             <RecordControls :vhost="vhostName" :app="appName" :streamName="selectedStream" />
+            <!-- Play Stream Action Card -->
+            <div class="bg-card rounded-xl border border-subtle p-6 flex flex-col justify-between">
+              <div>
+                <h3 class="flex items-center space-x-2 text-sm font-semibold text-foreground mb-4">
+                  <Play class="w-4 h-4 text-primary" />
+                  <span>Stream Player</span>
+                </h3>
+                <p class="text-xs text-muted-foreground leading-relaxed">
+                  Launch the interactive stream player to view diagnostics, check resolution and codecs, or listen to audio tracks in real-time.
+                </p>
+              </div>
+              <button
+                @click="showPlayer = true"
+                class="w-full mt-6 px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg text-sm font-semibold flex items-center justify-center space-x-2 transition-colors cursor-pointer"
+              >
+                <Play class="w-4 h-4 fill-current" />
+                <span>Play Stream</span>
+              </button>
+            </div>
           </div>
+        </div>
+      </transition>
+
+      <!-- Auto Recording Section -->
+      <transition name="fade">
+        <div v-if="selectedStream" class="space-y-4">
+          <div
+            @click="showAutoRecordConfig = !showAutoRecordConfig"
+            class="bg-card rounded-xl border border-subtle p-6 flex items-center justify-between cursor-pointer select-none shadow-sm"
+          >
+            <div class="flex items-center space-x-2">
+              <ChevronDown v-if="showAutoRecordConfig" class="w-5 h-5 text-muted-foreground" />
+              <ChevronRight v-else class="w-5 h-5 text-muted-foreground" />
+              <h2 class="text-lg font-bold text-foreground">Auto Recording</h2>
+            </div>
+            <span class="text-xs font-semibold text-muted-foreground uppercase">
+              {{ showAutoRecordConfig ? 'Collapse' : 'Expand' }}
+            </span>
+          </div>
+
+          <transition name="fade">
+            <div v-if="showAutoRecordConfig">
+              <AutoRecordConfig
+                :vhost="vhostName"
+                :app="appName"
+                :streamName="selectedStream || ''"
+              />
+            </div>
+          </transition>
         </div>
       </transition>
     </div>
   </div>
+
+  <StreamPlayer
+    :vhost="vhostName"
+    :app="appName"
+    :streamName="selectedStream || ''"
+    :show="showPlayer"
+    @close="showPlayer = false"
+  />
+
+  <AppConfigEditor
+    :vhost="vhostName"
+    :app="appName"
+    :show="showConfigEditor"
+    @close="showConfigEditor = false"
+    @saved="fetchApp"
+  />
 </template>
 
 <style scoped>

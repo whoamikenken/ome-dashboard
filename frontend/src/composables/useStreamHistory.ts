@@ -3,7 +3,7 @@ import type { StreamHistoryEntry, HistoryFilter, HistoryStats } from '@/types/hi
 
 const DB_NAME = 'ome-dashboard'
 const STORE_NAME = 'stream-history'
-const DB_VERSION = 1
+const DB_VERSION = 2
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -12,6 +12,9 @@ function openDB(): Promise<IDBDatabase> {
       const db = request.result
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: false })
+      }
+      if (!db.objectStoreNames.contains('notifications')) {
+        db.createObjectStore('notifications', { keyPath: 'id', autoIncrement: false })
       }
     }
     request.onsuccess = () => resolve(request.result)

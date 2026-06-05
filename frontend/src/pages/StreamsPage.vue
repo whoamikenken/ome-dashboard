@@ -3,7 +3,8 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAllStreams } from '@/composables/useAllStreams'
 import type { StreamEntry } from '@/composables/useAllStreams'
-import { Activity, Search, RefreshCw, AlertCircle, Eye, ArrowUpDown, Radio } from 'lucide-vue-next'
+import { Activity, Search, RefreshCw, AlertCircle, Eye, ArrowUpDown, Radio, Play } from 'lucide-vue-next'
+import StreamPlayer from '@/components/StreamPlayer.vue'
 
 const router = useRouter()
 const { streams, isLoading, error, lastUpdated, fetchAllStreams } = useAllStreams(15000)
@@ -14,6 +15,9 @@ const filterApp = ref('')
 const filterSourceType = ref('')
 const sortField = ref<'name' | 'vhost' | 'app' | 'sourceType' | 'createdTime'>('name')
 const sortDir = ref<'asc' | 'desc'>('asc')
+
+const selectedStream = ref<{ vhost: string; app: string; streamName: string } | null>(null)
+const showPlayer = ref(false)
 
 // Get unique values for filter dropdowns
 const uniqueVHosts = computed(() => [...new Set(streams.value.map(s => s.vhost))].sort())
@@ -344,14 +348,24 @@ function getSortIcon(field: string): string {
                 {{ formatDate(s.createdTime) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button
-                  @click="viewStream(s)"
-                  class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs text-primary hover:text-primary-hover bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors cursor-pointer"
-                  title="View Detail"
-                >
-                  <Eye class="w-3.5 h-3.5" />
-                  <span>View</span>
-                </button>
+                <div class="flex items-center justify-end space-x-2">
+                  <button
+                    @click="viewStream(s)"
+                    class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs text-primary hover:text-primary-hover bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors cursor-pointer"
+                    title="View Detail"
+                  >
+                    <Eye class="w-3.5 h-3.5" />
+                    <span>View</span>
+                  </button>
+                  <button
+                    @click="selectedStream = { vhost: s.vhost, app: s.app, streamName: s.name }; showPlayer = true"
+                    class="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs text-success hover:text-success/80 bg-success/10 hover:bg-success/20 rounded-lg transition-colors cursor-pointer"
+                    title="Play Stream"
+                  >
+                    <Play class="w-3.5 h-3.5 fill-current" />
+                    <span>Play</span>
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -359,4 +373,13 @@ function getSortIcon(field: string): string {
       </div>
     </div>
   </div>
+
+  <StreamPlayer
+    v-if="showPlayer && selectedStream"
+    :vhost="selectedStream.vhost"
+    :app="selectedStream.app"
+    :streamName="selectedStream.streamName"
+    :show="showPlayer"
+    @close="showPlayer = false; selectedStream = null"
+  />
 </template>

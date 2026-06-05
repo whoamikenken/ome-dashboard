@@ -16,6 +16,7 @@ const router = createRouter({
         { path: 'stats', name: 'stats', component: () => import('@/pages/StatsPage.vue') },
         { path: 'settings', name: 'settings', component: () => import('@/pages/SettingsPage.vue') },
         { path: 'auth', name: 'auth', component: () => import('@/pages/AuthPage.vue') },
+        { path: 'notifications', name: 'notifications', component: () => import('@/pages/NotificationsPage.vue') },
       ],
     },
   ],

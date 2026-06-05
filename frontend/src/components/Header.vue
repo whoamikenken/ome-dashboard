@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
+import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { Menu, Sun, Moon } from 'lucide-vue-next'
+import NotificationBell from '@/components/NotificationBell.vue'
+import NotificationPanel from '@/components/NotificationPanel.vue'
+import { useNotifications } from '@/composables/useNotifications'
 
 const props = defineProps<{
   theme: 'light' | 'dark'
@@ -14,7 +17,24 @@ const emit = defineEmits<{
 }>()
 
 const route = useRoute()
+const router = useRouter()
 const currentTime = ref('')
+
+const {
+  notifications,
+  unreadCount,
+  markAsRead,
+  markAllAsRead,
+  deleteNotification,
+  clearAll
+} = useNotifications()
+
+const showNotifications = ref(false)
+
+const handleViewAll = () => {
+  showNotifications.value = false
+  router.push('/notifications')
+}
 
 // Compute breadcrumbs from path
 const breadcrumbs = computed(() => {
@@ -73,7 +93,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <header class="flex items-center justify-between h-16 px-6 bg-card border-b border-subtle text-foreground shadow-sm">
+  <header class="flex items-center justify-between h-16 px-6 bg-card border-b border-subtle text-foreground shadow-sm animate-in fade-in duration-200">
     <!-- Left Side: Hamburger & Breadcrumbs -->
     <div class="flex items-center space-x-4">
       <button
@@ -105,12 +125,18 @@ onUnmounted(() => {
       </span>
     </div>
 
-    <!-- Right Side: Clock, Connection Status, Theme Toggle -->
+    <!-- Right Side: Clock, Notification Bell, Connection Status, Theme Toggle -->
     <div class="flex items-center space-x-6">
       <!-- Live Clock -->
       <div class="hidden md:block text-xs font-mono text-muted-foreground">
         {{ currentTime }}
       </div>
+
+      <!-- Notification Bell -->
+      <NotificationBell
+        :unread-count="unreadCount"
+        @toggle="showNotifications = !showNotifications"
+      />
 
       <!-- Status Indicator -->
       <div class="flex items-center space-x-2">
@@ -140,4 +166,19 @@ onUnmounted(() => {
       </button>
     </div>
   </header>
+
+  <!-- Notification Drawer Panel (Teleported to body for layout independence) -->
+  <Teleport to="body">
+    <NotificationPanel
+      :show="showNotifications"
+      :notifications="notifications"
+      :unread-count="unreadCount"
+      @close="showNotifications = false"
+      @mark-read="markAsRead"
+      @mark-all-read="markAllAsRead"
+      @delete="deleteNotification"
+      @clear-all="clearAll"
+      @view-all="handleViewAll"
+    />
+  </Teleport>
 </template>

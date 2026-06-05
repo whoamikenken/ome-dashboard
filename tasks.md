@@ -266,7 +266,7 @@ A system monitoring dashboard that connects to OvenMediaEngine (OME) via its RES
 
 ---
 
-## T17: Automatic Recording Rules
+## ✅ T17: Automatic Recording Rules (DONE)
 
 **Objective:** Per-application auto-record toggle and schedule-based recording.
 
@@ -284,7 +284,7 @@ A system monitoring dashboard that connects to OvenMediaEngine (OME) via its RES
 
 ---
 
-## T18: Live Stream Player
+## ✅ T18: Live Stream Player (DONE)
 
 **Objective:** Embedded video player to watch streams directly from the dashboard.
 
@@ -304,7 +304,7 @@ A system monitoring dashboard that connects to OvenMediaEngine (OME) via its RES
 
 ---
 
-## T19: Notifications & Alerts
+## ✅ T19: Notifications & Alerts (DONE)
 
 **Objective:** Real-time notifications for stream events and system alerts.
 
@@ -326,7 +326,7 @@ A system monitoring dashboard that connects to OvenMediaEngine (OME) via its RES
 
 ---
 
-## T20: Application Configuration Editor
+## ✅ T20: Application Configuration Editor (DONE)
 
 **Objective:** Full application configuration editor with form and JSON views.
 
