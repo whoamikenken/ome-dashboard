@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Server,
   Radio,
+  Clock,
   BarChart3,
   Settings,
   X
@@ -51,6 +52,12 @@ const navItems = [
     routeName: 'streams',
     path: '/streams',
     icon: Radio
+  },
+  {
+    label: 'History',
+    routeName: 'history',
+    path: '/history',
+    icon: Clock
   },
   {
     label: 'Statistics',

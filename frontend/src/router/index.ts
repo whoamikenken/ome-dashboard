@@ -12,6 +12,7 @@ const router = createRouter({
         { path: 'vhosts/:vhost', name: 'vhost-detail', component: () => import('@/pages/VHostDetailPage.vue') },
         { path: 'vhosts/:vhost/apps/:app', name: 'app-detail', component: () => import('@/pages/AppDetailPage.vue') },
         { path: 'streams', name: 'streams', component: () => import('@/pages/StreamsPage.vue') },
+        { path: 'history', name: 'history', component: () => import('@/pages/HistoryPage.vue') },
         { path: 'stats', name: 'stats', component: () => import('@/pages/StatsPage.vue') },
         { path: 'settings', name: 'settings', component: () => import('@/pages/SettingsPage.vue') },
       ],
