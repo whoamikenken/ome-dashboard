@@ -248,7 +248,7 @@ A system monitoring dashboard that connects to OvenMediaEngine (OME) via its RES
 
 ---
 
-## T16: LLHLS / WebRTC Settings Panel
+## ✅ T16: LLHLS / WebRTC Settings Panel (DONE)
 
 **Objective:** Configure low-latency streaming modes per application.
 

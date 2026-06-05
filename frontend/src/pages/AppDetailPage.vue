@@ -9,6 +9,10 @@ import OutputProfileList from '@/components/OutputProfileList.vue'
 import PushControls from '@/components/PushControls.vue'
 import RecordControls from '@/components/RecordControls.vue'
 import OutputProfileForm from '@/components/OutputProfileForm.vue'
+import { updateApp } from '@/api/apps'
+import LLHLSConfig from '@/components/LLHLSConfig.vue'
+import WebRTCConfig from '@/components/WebRTCConfig.vue'
+import { ChevronDown, ChevronRight } from 'lucide-vue-next'
 import {
   ArrowLeft,
   Plus,
@@ -43,6 +47,12 @@ const pullError = ref<string | null>(null)
 
 const showProfileEditor = ref(false)
 
+const showLatencyConfig = ref(false)
+const llhlsConfig = ref({ enabled: false, segmentDuration: 6, playlistWindowSize: 10, segmentCount: 5, chunkDuration: 200, maxBufferingQueueSize: 5 })
+const webrtcConfig = ref({ enabled: false, timeout: 30, iceServers: [{ urls: 'stun:stun.l.google.com:19302' }], portRange: { min: 10000, max: 60000 }, maxConnections: 100 })
+const latencySaving = ref(false)
+const latencyError = ref<string | null>(null)
+
 onMounted(() => {
   fetchApp()
   fetchStreams()
@@ -54,10 +64,68 @@ async function fetchApp() {
   try {
     const res = await getApp(vhostName.value, appName.value)
     app.value = res.response || null
+    if (app.value && app.value.providers) {
+      const providers = app.value.providers as any
+      if (providers.llhls) {
+        llhlsConfig.value = {
+          enabled: true,
+          segmentDuration: providers.llhls.segmentDuration ?? 6,
+          playlistWindowSize: providers.llhls.playlistWindowSize ?? 10,
+          segmentCount: providers.llhls.segmentCount ?? 5,
+          chunkDuration: providers.llhls.chunkDuration ?? 200,
+          maxBufferingQueueSize: providers.llhls.maxBufferingQueueSize ?? 5,
+        }
+      } else {
+        llhlsConfig.value.enabled = false
+      }
+      if (providers.webrtc) {
+        webrtcConfig.value = {
+          enabled: true,
+          timeout: providers.webrtc.timeout ?? 30,
+          iceServers: providers.webrtc.iceServers ?? [{ urls: 'stun:stun.l.google.com:19302' }],
+          portRange: providers.webrtc.portRange ?? { min: 10000, max: 60000 },
+          maxConnections: providers.webrtc.maxConnections ?? 100,
+        }
+      } else {
+        webrtcConfig.value.enabled = false
+      }
+    }
   } catch (err: any) {
     appError.value = err.response?.data?.message || err.message || 'Failed to fetch application'
   } finally {
     appLoading.value = false
+  }
+}
+
+async function handleSaveLatency() {
+  if (!app.value) return
+  latencySaving.value = true
+  latencyError.value = null
+  try {
+    const { enabled: llhlsEnabled, ...llhlsData } = llhlsConfig.value
+    const { enabled: webrtcEnabled, ...webrtcData } = webrtcConfig.value
+
+    const providers = { ...app.value.providers } as Record<string, any>
+    if (llhlsEnabled) {
+      providers.llhls = llhlsData
+    } else {
+      delete providers.llhls
+    }
+
+    if (webrtcEnabled) {
+      providers.webrtc = webrtcData
+    } else {
+      delete providers.webrtc
+    }
+
+    await updateApp(vhostName.value, appName.value, {
+      providers: providers as any
+    })
+    await fetchApp()
+  } catch (err: any) {
+    latencyError.value = err.response?.data?.message || err.message || 'Failed to save latency config'
+  } finally {
+    latencySaving.value = false
   }
 }
 
@@ -297,6 +365,72 @@ function getPublisherNames(): string[] {
             @saved="handleProfileSaved"
           />
         </div>
+      </div>
+
+      <!-- Latency & Streaming Config Section -->
+      <div class="bg-card rounded-xl border border-subtle p-6 space-y-4">
+        <div
+          @click="showLatencyConfig = !showLatencyConfig"
+          class="flex items-center justify-between cursor-pointer select-none"
+        >
+          <div class="flex items-center space-x-2">
+            <ChevronDown v-if="showLatencyConfig" class="w-5 h-5 text-muted-foreground" />
+            <ChevronRight v-else class="w-5 h-5 text-muted-foreground" />
+            <h2 class="text-xl font-bold text-foreground">Latency & Streaming Config</h2>
+          </div>
+          <span class="text-xs font-semibold text-muted-foreground uppercase">
+            {{ showLatencyConfig ? 'Collapse' : 'Expand' }}
+          </span>
+        </div>
+
+        <transition name="fade">
+          <div v-if="showLatencyConfig" class="space-y-4 pt-4 border-t border-subtle">
+            <!-- Error Banner -->
+            <div
+              v-if="latencyError"
+              class="flex items-center justify-between p-4 bg-danger/10 border border-danger/20 rounded-xl"
+            >
+              <div class="flex items-center space-x-3">
+                <AlertCircle class="w-5 h-5 text-danger" />
+                <span class="text-sm font-medium text-danger">{{ latencyError }}</span>
+              </div>
+              <button
+                @click="latencyError = null"
+                class="text-sm font-semibold text-danger hover:text-danger/80 cursor-pointer"
+              >
+                Dismiss
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <LLHLSConfig
+                :vhost="vhostName"
+                :app="appName"
+                v-model:config="llhlsConfig"
+                :loading="latencySaving"
+                @save="handleSaveLatency"
+              />
+              <WebRTCConfig
+                :vhost="vhostName"
+                :app="appName"
+                v-model:config="webrtcConfig"
+                :loading="latencySaving"
+                @save="handleSaveLatency"
+              />
+            </div>
+
+            <div class="flex justify-end pt-2">
+              <button
+                @click="handleSaveLatency"
+                :disabled="latencySaving"
+                class="px-4 py-2 text-sm font-semibold text-white bg-primary hover:bg-primary-hover disabled:opacity-50 rounded-lg transition-colors flex items-center space-x-2 cursor-pointer"
+              >
+                <Loader2 v-if="latencySaving" class="w-4 h-4 animate-spin" />
+                <span>{{ latencySaving ? 'Saving...' : 'Save Latency Config' }}</span>
+              </button>
+            </div>
+          </div>
+        </transition>
       </div>
 
 
