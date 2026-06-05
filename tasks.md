@@ -209,7 +209,7 @@ A system monitoring dashboard that connects to OvenMediaEngine (OME) via its RES
 
 ---
 
-## T14: Stream Publish Authentication
+## ✅ T14: Stream Publish Authentication (DONE)
 
 **Objective:** Manage per-stream and per-application publish access tokens/keys.
 

@@ -8,6 +8,7 @@ import {
   Clock,
   BarChart3,
   Settings,
+  Shield,
   X
 } from 'lucide-vue-next'
 
@@ -64,6 +65,12 @@ const navItems = [
     routeName: 'stats',
     path: '/stats',
     icon: BarChart3
+  },
+  {
+    label: 'Authentication',
+    routeName: 'auth',
+    path: '/auth',
+    icon: Shield
   },
   {
     label: 'Settings',
