@@ -9,6 +9,7 @@ import {
   BarChart3,
   Settings,
   Shield,
+  Bell,
   X
 } from 'lucide-vue-next'
 
@@ -71,6 +72,12 @@ const navItems = [
     routeName: 'auth',
     path: '/auth',
     icon: Shield
+  },
+  {
+    label: 'Notifications',
+    routeName: 'notifications',
+    path: '/notifications',
+    icon: Bell
   },
   {
     label: 'Settings',
