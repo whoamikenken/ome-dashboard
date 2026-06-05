@@ -229,7 +229,7 @@ A system monitoring dashboard that connects to OvenMediaEngine (OME) via its RES
 
 ---
 
-## T15: ABR & Output Profile Management
+## ✅ T15: ABR & Output Profile Management (DONE)
 
 **Objective:** Visual ABR ladder editor — add, remove, and configure renditions per application.
 

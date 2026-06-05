@@ -20,3 +20,9 @@ export async function deleteApp(vhost: string, app: string) {
   const res = await api.delete<OmeResponse<null>>(`/vhosts/${encodeURIComponent(vhost)}/apps/${encodeURIComponent(app)}`)
   return res.data
 }
+
+export async function updateApp(vhost: string, app: string, data: Partial<Application>): Promise<OmeResponse<Application>> {
+  const res = await api.put<OmeResponse<Application>>(`/vhosts/${encodeURIComponent(vhost)}/apps/${encodeURIComponent(app)}`, data)
+  return res.data
+}
+

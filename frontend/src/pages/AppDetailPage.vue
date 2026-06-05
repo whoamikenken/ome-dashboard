@@ -8,6 +8,7 @@ import StreamTable from '@/components/StreamTable.vue'
 import OutputProfileList from '@/components/OutputProfileList.vue'
 import PushControls from '@/components/PushControls.vue'
 import RecordControls from '@/components/RecordControls.vue'
+import OutputProfileForm from '@/components/OutputProfileForm.vue'
 import {
   ArrowLeft,
   Plus,
@@ -40,6 +41,8 @@ const pullUrl = ref('')
 const isPullingStream = ref(false)
 const pullError = ref<string | null>(null)
 
+const showProfileEditor = ref(false)
+
 onMounted(() => {
   fetchApp()
   fetchStreams()
@@ -57,6 +60,12 @@ async function fetchApp() {
     appLoading.value = false
   }
 }
+
+async function handleProfileSaved() {
+  showProfileEditor.value = false
+  await fetchApp()
+}
+
 
 async function fetchStreams() {
   streamsLoading.value = true
@@ -272,8 +281,24 @@ function getPublisherNames(): string[] {
         <!-- Output Profiles Card -->
         <div>
           <OutputProfileList :profiles="app.outputProfiles || []" />
+          <div class="mt-4 flex justify-end">
+            <button
+              @click="showProfileEditor = true"
+              class="px-4 py-2 bg-primary/10 hover:bg-primary/25 border border-primary/30 text-primary rounded-lg text-sm font-semibold flex items-center space-x-2 transition-colors cursor-pointer"
+            >
+              <span>Edit Profiles</span>
+            </button>
+          </div>
+          <OutputProfileForm
+            :vhost="vhostName"
+            :app="appName"
+            :show="showProfileEditor"
+            @close="showProfileEditor = false"
+            @saved="handleProfileSaved"
+          />
         </div>
       </div>
+
 
       <!-- Streams section -->
       <div class="space-y-4">
