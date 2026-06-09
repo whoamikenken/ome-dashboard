@@ -58,7 +58,9 @@ export function useAllStreams(pollInterval = 15000) {
                   vhost,
                   app,
                   sourceType: detail?.input?.sourceType || '',
-                  sourceUrl: detail?.input?.sourceUrl || '',
+                  sourceUrl: detail?.input?.sourceUrl || 
+                    (detail?.input?.sourceType === 'llhls' ? `https://${vhost}:${app}/llhls` : 
+                     detail?.input?.sourceType !== '' ? `https://${vhost}:${app}/${detail.input.sourceType}` : `https://${vhost}:${app}/llhls`),
                   createdTime: detail?.input?.createdTime || '',
                   videoTracks: detail?.input?.tracks?.video?.length || 0,
                   audioTracks: detail?.input?.tracks?.audio?.length || 0,

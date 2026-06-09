@@ -27,7 +27,7 @@ const emit = defineEmits<{
   (e: 'close'): void
 }>()
 
-const selectedProtocol = ref<'webrtc' | 'hls' | 'llhls'>('webrtc')
+const selectedProtocol = ref<'webrtc' | 'hls' | 'llhls'>('llhls')
 const showInfo = ref(false)
 const videoContainerRef = ref<HTMLDivElement | null>(null)
 

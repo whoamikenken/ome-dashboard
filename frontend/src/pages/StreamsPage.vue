@@ -330,7 +330,7 @@ function getSortIcon(field: string): string {
                 <span v-else class="text-muted-foreground/40">-</span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <div class="truncate max-w-[200px] text-xs text-muted-foreground font-mono" :title="s.sourceUrl || ''">
+                <div :class="['truncate max-w-[200px] text-xs font-mono', s.sourceUrl?.includes('llhls') ? 'text-success' : 'text-muted-foreground']" :title="s.sourceUrl || ''">
                   {{ s.sourceUrl || '-' }}
                 </div>
               </td>

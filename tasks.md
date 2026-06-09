@@ -326,19 +326,15 @@ A system monitoring dashboard that connects to OvenMediaEngine (OME) via its RES
 
 ---
 
-## ✅ T20: Application Configuration Editor (DONE)
+## ✅ T21: Stream Protocol Defaults (DONE)
 
-**Objective:** Full application configuration editor with form and JSON views.
+**Objective:** Set LLHLS as the default protocol for streams where supported.
 
 **Files:**
-- Create: `frontend/src/components/AppConfigEditor.vue`
-- Create: `frontend/src/components/ConfigDiffViewer.vue`
-- Modify: `frontend/src/pages/AppDetailPage.vue` — integrate editor
+|- Modify: `frontend/src/api/streams.ts` — update stream creation and retrieval logic to prefer LLHLS
+|- Modify: `frontend/src/pages/StreamsPage.vue` — reflect default protocol in UI
 
 **Features:**
-- Full app config form (providers, publishers, output profiles)
-- JSON editor view for advanced users (with syntax highlighting)
-- Config diff/comparison view (before vs after changes)
-- Validation before applying
-- Config templates (pre-built profiles for common use cases)
-- One-click restore to defaults
+|- Default to LLHLS for new streams (if supported by output profiles)
+|- Protocol indicators (LLHLS, HLS, WebRTC) in the stream table
+|- Automated URL generation favoring low-latency protocols

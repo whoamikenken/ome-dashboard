@@ -16,8 +16,11 @@ export async function deleteStream(vhost: string, app: string, stream: string) {
   return res.data
 }
 
-export async function pullStream(vhost: string, app: string, data: { name: string; urls: string[] }) {
-  const res = await api.post<OmeResponse<any>>(`/vhosts/${encodeURIComponent(vhost)}/apps/${encodeURIComponent(app)}/streams`, data)
-  return res.data
+export async function pullStream(vhost: string, app: string, data: { name: string; urls?: string[] }) {
+  const payload = {
+    name: data.name,
+    urls: data.urls || [`https://${vhost}:${app}/llhls`],
+  };
+  const res = await api.post<OmeResponse<any>>(`/vhosts/${encodeURIComponent(vhost)}/apps/${encodeURIComponent(app)}/streams`, payload);
+  return res.data;
 }
-
