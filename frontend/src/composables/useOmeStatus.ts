@@ -47,34 +47,44 @@ export function useOmeStatus(pollInterval = 10000) {
       let activeStreams = 0
       const vhostStreams: { name: string; count: number }[] = []
 
-      // For each vhost, get apps
-      for (const vhost of vhostNames) {
-        try {
-          const appsRes = await listApps(vhost)
-          const appNames: string[] = appsRes.response || appsRes
-          totalApps += appNames.length
+      // For each vhost, get apps concurrently
+      await Promise.all(
+        vhostNames.map(async (vhost) => {
+          try {
+            const appsRes = await listApps(vhost)
+            const appNames: string[] = appsRes.response || appsRes
 
-          let vhostStreamCount = 0
+            let vhostStreamCount = 0
 
-          // For each app, get streams
-          for (const app of appNames) {
-            try {
-              const streamsRes = await listStreams(vhost, app)
-              const streamNames: string[] = streamsRes.response || streamsRes
-              vhostStreamCount += streamNames.length
-              totalStreams += streamNames.length
-              // For now, count all streams as active
-              activeStreams += streamNames.length
-            } catch {
-              // Skip apps that error
-            }
+            // For each app, get streams concurrently
+            await Promise.all(
+              appNames.map(async (app) => {
+                try {
+                  const streamsRes = await listStreams(vhost, app)
+                  const streamNames: string[] = streamsRes.response || streamsRes
+                  vhostStreamCount += streamNames.length
+                } catch {
+                  // Skip apps that error
+                }
+              })
+            )
+
+            // Note: Since Promise.all executes concurrently, modifying shared variables
+            // inside the map callbacks is safe in JS (single-threaded), but it's cleaner
+            // to sum them up or push to the array. However, we'll keep it simple for now.
+            totalApps += appNames.length
+            totalStreams += vhostStreamCount
+            activeStreams += vhostStreamCount
+
+            vhostStreams.push({ name: vhost, count: vhostStreamCount })
+          } catch {
+            // Skip vhosts that error
           }
+        })
+      )
 
-          vhostStreams.push({ name: vhost, count: vhostStreamCount })
-        } catch {
-          // Skip vhosts that error
-        }
-      }
+      // Sort vhostStreams to maintain consistent order as they might finish in any order
+      vhostStreams.sort((a, b) => a.name.localeCompare(b.name))
 
       stats.value = {
         ...stats.value,
