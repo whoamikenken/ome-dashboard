@@ -35,18 +35,18 @@ export function useAllStreams(pollInterval = 15000) {
       const vhostNames: string[] = (vhostRes as any).response || vhostRes
 
       // 2. For each vhost, get apps
-      for (const vhost of vhostNames) {
+      await Promise.all(vhostNames.map(async (vhost) => {
         try {
           const appsRes = await listApps(vhost)
           const appNames: string[] = (appsRes as any).response || appsRes
 
           // 3. For each app, get streams
-          for (const app of appNames) {
+          await Promise.all(appNames.map(async (app) => {
             try {
               const streamsRes = await listStreams(vhost, app)
               const streamNames: string[] = (streamsRes as any).response || streamsRes
 
-              for (const name of streamNames) {
+              await Promise.all(streamNames.map(async (name) => {
                 let detail: Stream | undefined
                 try {
                   const detailRes = await getStream(vhost, app, name)
@@ -64,11 +64,11 @@ export function useAllStreams(pollInterval = 15000) {
                   audioTracks: detail?.input?.tracks?.audio?.length || 0,
                   detail,
                 })
-              }
+              }))
             } catch { /* skip app errors */ }
-          }
+          }))
         } catch { /* skip vhost errors */ }
-      }
+      }))
 
       streams.value = allStreams
       lastUpdated.value = new Date()
